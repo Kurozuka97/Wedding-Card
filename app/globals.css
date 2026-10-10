@@ -481,6 +481,32 @@ select.field-dark option {
   transform: translateX(-50%);
 }
 
+/* ── mini music player ── */
+.yt-thumb {
+  background: #320818;
+}
+.yt-thumb iframe {
+  width: 150%;
+  height: 150%;
+  min-width: 150%;
+  min-height: 150%;
+  border: 0;
+}
+.yt-spin::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  border-top-color: #e9cf9a;
+  animation: ytspin 1.6s linear infinite;
+}
+@keyframes ytspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ── hairline row ── */
 .row-hair {
   border-top: 1px solid rgba(243, 233, 220, 0.12);

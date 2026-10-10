@@ -3,6 +3,51 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { config } from "@/lib/config";
 
+/* ── YouTube IFrame API (background music) ── */
+declare global {
+  interface Window {
+    YT?: YTNamespace;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+interface YTPlayer {
+  playVideo(): void;
+  pauseVideo(): void;
+  destroy(): void;
+}
+interface YTNamespace {
+  Player: new (el: HTMLElement, options: Record<string, unknown>) => YTPlayer;
+}
+
+const YT_VIDEO_ID = "wM66-6ISA-k";
+const YT_TRACK_LABEL = "Faouzia — Unethical";
+let ytApiPromise: Promise<YTNamespace> | null = null;
+
+function loadYTApi(): Promise<YTNamespace> {
+  if (typeof window === "undefined") return Promise.reject(new Error("ssr"));
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise<YTNamespace>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("yt-timeout")), 10000);
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      prev?.();
+      clearTimeout(timer);
+      if (window.YT) resolve(window.YT);
+      else reject(new Error("yt-missing"));
+    };
+    const s = document.createElement("script");
+    s.src = "https://www.youtube.com/iframe_api";
+    s.async = true;
+    s.onerror = () => {
+      clearTimeout(timer);
+      reject(new Error("yt-load-failed"));
+    };
+    document.head.appendChild(s);
+  });
+  return ytApiPromise;
+}
+
 /* ── types ── */
 interface Wish {
   id: string;
@@ -67,6 +112,8 @@ export function Invitation() {
   const [cdH, setCdH] = useState("00");
   const [cdM, setCdM] = useState("00");
   const [cdS, setCdS] = useState("00");
+  const [musicStarted, setMusicStarted] = useState(false);
+  const [miniCollapsed, setMiniCollapsed] = useState(false);
 
   /* refs */
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,6 +127,11 @@ export function Invitation() {
   const cdHRef = useRef<string>("00");
   const cdMRef = useRef<string>("00");
   const cdSRef = useRef<string>("00");
+  const ytHostRef = useRef<HTMLDivElement | null>(null);
+  const ytPlayerRef = useRef<YTPlayer | null>(null);
+  const ytReadyRef = useRef(false);
+  const ytWantedRef = useRef(false);
+  const ytFailedRef = useRef(false);
 
   /* ── helpers ── */
   const showToast = useCallback((msg: string) => {
@@ -177,7 +229,7 @@ export function Invitation() {
     mStepRef.current++;
   }
 
-  function startMusic() {
+  function startSynth() {
     initAudio();
     const ctx = audioCtxRef.current;
     const gain = mGainRef.current;
@@ -192,7 +244,7 @@ export function Invitation() {
     setMusicOn(true);
   }
 
-  function stopMusic() {
+  function stopSynth() {
     const ctx = audioCtxRef.current;
     const gain = mGainRef.current;
     if (ctx && gain) {
@@ -200,8 +252,6 @@ export function Invitation() {
       gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
       gain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
     }
-    mOnRef.current = false;
-    setMusicOn(false);
     setTimeout(() => {
       if (!mOnRef.current && mTimerRef.current) {
         clearInterval(mTimerRef.current);
@@ -209,6 +259,83 @@ export function Invitation() {
       }
     }, 650);
   }
+
+  /* YouTube-first music; WebAudio synth is the fallback */
+  function startMusic() {
+    mOnRef.current = true;
+    setMusicOn(true);
+    setMusicStarted(true);
+    if (ytFailedRef.current) {
+      startSynth();
+      return;
+    }
+    if (ytReadyRef.current && ytPlayerRef.current) {
+      ytPlayerRef.current.playVideo();
+    }
+    /* else: the [musicStarted] effect loads the API & player, onReady plays */
+  }
+
+  function stopMusic() {
+    mOnRef.current = false;
+    setMusicOn(false);
+    if (ytReadyRef.current && ytPlayerRef.current) {
+      ytPlayerRef.current.pauseVideo();
+    } else {
+      stopSynth();
+    }
+  }
+
+  /* create the YouTube player once the mini-player host is mounted */
+  useEffect(() => {
+    if (!musicStarted || ytFailedRef.current || ytPlayerRef.current) return;
+    let cancelled = false;
+    loadYTApi()
+      .then((YT) => {
+        if (cancelled || !ytHostRef.current || ytPlayerRef.current) return;
+        /* inner div is replaced by the iframe; keeps React's ref node intact */
+        const mount = document.createElement("div");
+        ytHostRef.current.appendChild(mount);
+        ytPlayerRef.current = new YT.Player(mount, {
+          videoId: YT_VIDEO_ID,
+          width: "120",
+          height: "68",
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1,
+            loop: 1,
+            playlist: YT_VIDEO_ID,
+          },
+          events: {
+            onReady: (e: { target: YTPlayer }) => {
+              ytReadyRef.current = true;
+              if (mOnRef.current) e.target.playVideo();
+            },
+            onStateChange: (e: { data: number }) => {
+              /* ended → replay (loop safety net) */
+              if (e.data === 0 && mOnRef.current && ytPlayerRef.current) {
+                ytPlayerRef.current.playVideo();
+              }
+            },
+            onError: () => {
+              /* blocked/deleted → fall back to the synth */
+              ytFailedRef.current = true;
+              ytReadyRef.current = false;
+              if (mOnRef.current) startSynth();
+            },
+          },
+        });
+      })
+      .catch(() => {
+        ytFailedRef.current = true;
+        if (mOnRef.current) startSynth();
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [musicStarted]);
 
   /* ── countdown ── */
   useEffect(() => {
@@ -738,7 +865,7 @@ export function Invitation() {
 
             <div className="frame-gold overflow-hidden rounded-xl relative" data-reveal>
               <figure className="w-full aspect-[4/4.4] md:aspect-[16/8]">
-                <img className="kenburns" src="/venue.svg" alt={config.venueName} />
+                <img className="kenburns" src="/venue.webp" alt={config.venueName} />
               </figure>
               <div className="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 bg-maroon-dark/80 backdrop-blur-md rounded-xl px-5 py-4 text-center border border-gold/40">
                 <p className="mlabel !text-[9px] text-gold-light mb-2">Tempat</p>
@@ -1066,6 +1193,48 @@ export function Invitation() {
           </div>
         </footer>
       </main>
+
+      {/* ═══ YT MINI PLAYER ═══ */}
+      {musicStarted && !ytFailedRef.current && (
+        <div
+          className={`fixed left-1/2 -translate-x-1/2 z-[81] transition-all duration-500 ${
+            miniCollapsed
+              ? "bottom-[calc(4.6rem+env(safe-area-inset-bottom))] opacity-60 hover:opacity-100"
+              : "bottom-[calc(5.2rem+env(safe-area-inset-bottom))]"
+          }`}
+        >
+          <div className="flex items-center gap-2 bg-maroon-dark/92 backdrop-blur-md border border-gold/40 rounded-full pl-1.5 pr-3 py-1.5 shadow-[0_8px_24px_rgba(0,0,0,.5)]">
+            <button
+              onClick={() => setMiniCollapsed(!miniCollapsed)}
+              className={`relative shrink-0 rounded-full overflow-hidden border border-gold/50 bg-maroon ${
+                miniCollapsed ? "w-8 h-8" : "w-10 h-10"
+              } transition-all duration-300 ${musicOn ? "yt-spin" : ""}`}
+              aria-label={miniCollapsed ? "Buka pemain muzik" : "Ciut pemain muzik"}
+            >
+              {/* player stays mounted always; overlay hides it when collapsed */}
+              <div
+                ref={ytHostRef}
+                className={`absolute inset-0 [&_iframe]:absolute [&_iframe]:top-1/2 [&_iframe]:left-1/2 [&_iframe]:-translate-x-1/2 [&_iframe]:-translate-y-1/2 [&_iframe]:pointer-events-none ${
+                  miniCollapsed ? "opacity-0" : "opacity-100"
+                } transition-opacity duration-300`}
+              />
+              {miniCollapsed && (
+                <div className="absolute inset-0 flex items-center justify-center bg-maroon text-gold-light text-sm pointer-events-none">
+                  ♪
+                </div>
+              )}
+            </button>
+            {!miniCollapsed && (
+              <div className="min-w-0">
+                <p className="mlabel !text-[7px] text-gold/70 leading-none">Muzik</p>
+                <p className="font-body italic text-[11px] text-cream/70 leading-tight truncate max-w-[110px]">
+                  {YT_TRACK_LABEL}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ═══ ACTION BAR ═══ */}
       <div id="actionBar" className={barShow ? "show" : ""}>

@@ -50,7 +50,7 @@ export const config = {
   gallery: [
     { src: "/couple.svg", caption: "senja milik kita", extra: "" },
     { src: "/gallery-2.svg", caption: "genggaman janji", extra: "md:mt-14 md:-rotate-3" },
-    { src: "/venue.svg", caption: "singgahsana cinta", extra: "md:rotate-2" },
+    { src: "/venue.webp", caption: "singgahsana cinta", extra: "md:rotate-2" },
     { src: "/gallery-4.svg", caption: "segala yang manis", extra: "md:mt-10 md:-rotate-6" },
   ],
 
