@@ -863,11 +863,11 @@ export function Invitation() {
               </div>
             </div>
 
-            <div className="frame-gold overflow-hidden rounded-xl relative" data-reveal>
+            <div className="frame-gold overflow-hidden rounded-xl" data-reveal>
               <figure className="w-full aspect-[4/4.4] md:aspect-[16/8]">
                 <img className="kenburns" src="/venue.webp" alt={config.venueName} />
               </figure>
-              <div className="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 bg-maroon-dark/80 backdrop-blur-md rounded-xl px-5 py-4 text-center border border-gold/40">
+              <div className="relative bg-maroon-dark/90 px-5 py-6 md:py-7 text-center border-t border-gold/30">
                 <p className="mlabel !text-[9px] text-gold-light mb-2">Tempat</p>
                 <p className="font-display text-xl md:text-3xl font-light text-cream">
                   {config.venueName}
