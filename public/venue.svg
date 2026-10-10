@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="vbg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d0a1c"/>
+      <stop offset="60%" stop-color="#4a0e20"/>
+      <stop offset="100%" stop-color="#22040e"/>
+    </linearGradient>
+    <linearGradient id="vgold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d3a94f" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#f6e7c1" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#d3a94f" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="600" fill="url(#vbg)"/>
+  <!-- architectural suggestion: pillars -->
+  <rect x="120" y="100" width="30" height="420" fill="#6b1830" opacity="0.5"/>
+  <rect x="750" y="100" width="30" height="420" fill="#6b1830" opacity="0.5"/>
+  <rect x="110" y="90" width="50" height="16" fill="#d3a94f" opacity="0.4"/>
+  <rect x="740" y="90" width="50" height="16" fill="#d3a94f" opacity="0.4"/>
+  <!-- arch -->
+  <path d="M200 320 Q450 80 700 320" fill="none" stroke="url(#vgold)" stroke-width="2.5"/>
+  <path d="M220 320 Q450 120 680 320" fill="none" stroke="#d3a94f" stroke-width="1" opacity="0.4"/>
+  <!-- floor line -->
+  <line x1="0" y1="520" x2="900" y2="520" stroke="#d3a94f" stroke-width="1" opacity="0.35"/>
+  <!-- text -->
+  <text x="450" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#e9cf9a" font-style="italic" opacity="0.85">Dewan Kota Kechil</text>
+  <text x="450" y="400" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#d3a94f" letter-spacing="3" opacity="0.6">KOTA TINGGI, JOHOR</text>
+  <text x="450" y="460" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#f3e9dc" opacity="0.45">GANTIKAN DENGAN GAMBAR DEWAN ANDA</text>
+  <!-- chandelier hint -->
+  <circle cx="450" cy="140" r="8" fill="#f6e7c1" opacity="0.7"/>
+  <line x1="450" y1="100" x2="450" y2="132" stroke="#d3a94f" stroke-width="1.2" opacity="0.5"/>
+  <circle cx="420" cy="160" r="4" fill="#f6e7c1" opacity="0.45"/>
+  <circle cx="480" cy="160" r="4" fill="#f6e7c1" opacity="0.45"/>
+  <circle cx="450" cy="175" r="5" fill="#f6e7c1" opacity="0.55"/>
+</svg>

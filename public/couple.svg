@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#320818"/>
+      <stop offset="50%" stop-color="#4a0e20"/>
+      <stop offset="100%" stop-color="#22040e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#6b1830" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#320818" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldline" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d3a94f"/>
+      <stop offset="50%" stop-color="#f6e7c1"/>
+      <stop offset="100%" stop-color="#d3a94f"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <rect width="600" height="800" fill="url(#glow)"/>
+  <!-- decorative frame -->
+  <rect x="40" y="40" width="520" height="720" fill="none" stroke="url(#goldline)" stroke-width="2" rx="4"/>
+  <rect x="52" y="52" width="496" height="696" fill="none" stroke="#d3a94f" stroke-width="0.8" opacity="0.5" rx="2"/>
+  <!-- corner ornaments -->
+  <path d="M40 80 Q40 40 80 40" fill="none" stroke="#f6e7c1" stroke-width="2.5"/>
+  <path d="M520 40 Q560 40 560 80" fill="none" stroke="#f6e7c1" stroke-width="2.5"/>
+  <path d="M560 720 Q560 760 520 760" fill="none" stroke="#f6e7c1" stroke-width="2.5"/>
+  <path d="M80 760 Q40 760 40 720" fill="none" stroke="#f6e7c1" stroke-width="2.5"/>
+  <!-- monogram -->
+  <text x="300" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="120" fill="#e9cf9a" font-style="italic" opacity="0.9">A &amp; F</text>
+  <text x="300" y="440" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#d3a94f" letter-spacing="8" opacity="0.7">WALIMATULURUS</text>
+  <!-- divider -->
+  <line x1="200" y1="470" x2="400" y2="470" stroke="#d3a94f" stroke-width="0.8" opacity="0.5"/>
+  <text x="300" y="510" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#f6e7c1" opacity="0.8">✦</text>
+  <text x="300" y="560" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#e9cf9a" font-style="italic" opacity="0.75">03 · 07 · 2027</text>
+  <text x="300" y="620" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#d3a94f" letter-spacing="4" opacity="0.6">GANTIKAN DENGAN FOTO ANDA</text>
+  <!-- soft petals hint -->
+  <ellipse cx="150" cy="200" rx="24" ry="14" fill="#6b1830" opacity="0.5" transform="rotate(-30 150 200)"/>
+  <ellipse cx="450" cy="600" rx="20" ry="12" fill="#6b1830" opacity="0.4" transform="rotate(20 450 600)"/>
+  <ellipse cx="480" cy="180" rx="16" ry="10" fill="#1e7a5e" opacity="0.3" transform="rotate(-15 480 180)"/>
+</svg>
