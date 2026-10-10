@@ -31,8 +31,10 @@ export async function GET() {
   ];
   return new NextResponse(lines.join("\r\n"), {
     headers: {
-      "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${config.icsFilename}"`,
+      /* method=PUBLISH + inline → iOS Safari opens the native
+         "Event → Add to Calendar" screen instead of a file download */
+      "Content-Type": "text/calendar; method=PUBLISH; charset=utf-8",
+      "Content-Disposition": `inline; filename="${config.icsFilename}"`,
       "Cache-Control": "public, max-age=86400",
     },
   });

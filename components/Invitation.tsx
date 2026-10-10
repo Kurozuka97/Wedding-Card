@@ -538,7 +538,15 @@ export function Invitation() {
       /iPad|iPhone|iPod/.test(ua) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     if (isIOS) {
-      window.location.href = "/api/ics";
+      /* in-app browsers (WhatsApp etc.) can't render the calendar screen —
+         Safari can, so point guests there */
+      const inApp = /WhatsApp|FBAN|FBAV|Instagram|Line\//i.test(ua);
+      if (inApp) {
+        showToast("Buka dalam Safari ➜ tambah ke Kalendar");
+      } else {
+        /* Safari shows the native Event screen → one tap "Add to Calendar" */
+        window.location.href = "/api/ics";
+      }
     } else {
       const params = new URLSearchParams({
         action: "TEMPLATE",
