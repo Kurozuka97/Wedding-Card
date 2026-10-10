@@ -529,33 +529,31 @@ export function Invitation() {
     t.remove();
   }
 
-  /* ── ICS download ── */
+  /* ── save the date ──
+   * iOS: navigate to the server-hosted .ics → native "Add to Calendar" sheet.
+   * Android / desktop: pre-filled Google Calendar event → one tap to save. */
   function downloadICS() {
-    const lines = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//AmaniFarhan//Wedding//EN",
-      "BEGIN:VEVENT",
-      "UID:af-wedding-20270703@invite",
-      "DTSTAMP:20270101T000000Z",
-      `DTSTART:${config.icsStart}`,
-      `DTEND:${config.icsEnd}`,
-      `SUMMARY:Walimatulurus ${config.bride} & ${config.groom}`,
-      `DESCRIPTION:Majlis perkahwinan ${config.bride} & ${config.groom}. Aturcara 11:00 pagi - 4:00 petang.`,
-      `LOCATION:${config.venueName}\\, ${config.venueAddress.replace(/,/g, "\\,")}`,
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-    const blob = new Blob([lines], { type: "text/calendar" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = config.icsFilename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    showToast("Tarikh disimpan 📅");
+    const ua = navigator.userAgent || "";
+    const isIOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isIOS) {
+      window.location.href = "/api/ics";
+    } else {
+      const params = new URLSearchParams({
+        action: "TEMPLATE",
+        text: `Walimatulurus ${config.bride} & ${config.groom}`,
+        dates: `${config.icsStart}/${config.icsEnd}`,
+        details: `Majlis perkahwinan ${config.bride} & ${config.groom}. Aturcara 11:00 pagi - 4:00 petang.`,
+        location: `${config.venueName}, ${config.venueAddress}`,
+      });
+      window.open(
+        `https://calendar.google.com/calendar/render?${params.toString()}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+    showToast("Tambah ke kalendar ✦");
   }
 
   function goTo(id: string) {
